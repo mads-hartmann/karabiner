@@ -1,6 +1,8 @@
 import fs from "fs";
 import { KarabinerRules } from "./types";
 import { createHyperSubLayers, app, open } from "./utils";
+import * as ShiftLock from "./shiftlock"
+
 
 const rules: KarabinerRules[] = [
   {
@@ -123,6 +125,27 @@ const rules: KarabinerRules[] = [
         ],
         type: "basic",
       },
+    ],
+  },
+  // Experimental: Trying to implement a shift-lock feature so I can emulate Emacs' set-mark feature
+  {
+    description: "Shift-lock toggle",
+    manipulators: [
+      ShiftLock.on({key_code: "spacebar", modifiers: { mandatory: ["control"] }}),
+
+      ShiftLock.off({key_code: "spacebar", modifiers: { mandatory: ["control"] }}),
+      ShiftLock.off({key_code: "escape" }),
+      ShiftLock.off({key_code: "delete_or_backspace" }, {passThrough: true}),
+      ShiftLock.off({key_code: "g", modifiers: { mandatory: ["control"] }}),
+
+      ShiftLock.transform({key_code: "n", modifiers: { mandatory: ["control"] }}, "down_arrow"),
+      ShiftLock.transform({key_code: "p", modifiers: { mandatory: ["control"] }}, "up_arrow"),
+      ShiftLock.transform({key_code: "f", modifiers: { mandatory: ["control"] }}, "right_arrow"),
+      ShiftLock.transform({key_code: "b", modifiers: { mandatory: ["control"] }}, "left_arrow"),
+      ShiftLock.transform({key_code: "down_arrow"}, "down_arrow"),
+      ShiftLock.transform({key_code: "up_arrow"}, "up_arrow"),
+      ShiftLock.transform({key_code: "right_arrow"}, "right_arrow"),
+      ShiftLock.transform({key_code: "left_arrow"}, "left_arrow"),
     ],
   },
   ...createHyperSubLayers({
