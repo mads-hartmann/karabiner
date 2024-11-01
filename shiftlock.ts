@@ -1,4 +1,4 @@
-import { From, KeyCode, Manipulator, Modifiers, To } from "./types";
+import { From, KeyCode, Manipulator, Modifiers, To, VariableCondition } from "./types";
 
 const SHIFT_LOCK = "shiftlock";
 
@@ -29,6 +29,7 @@ export function on(from: From): Manipulator {
 
 type OffOptions = {
   passThrough: boolean;
+  alsoSendKey?: KeyCode;
 };
 
 /**
@@ -55,6 +56,12 @@ export function off(
     });
   }
 
+  if (options.alsoSendKey) {
+    to.push({
+      key_code: options.alsoSendKey,
+    });
+  }
+
   return {
     from: from,
     to: to,
@@ -69,21 +76,31 @@ export function off(
   };
 }
 
+export const ShiftLockEnabled: VariableCondition = {
+  type: "variable_if",
+  name: SHIFT_LOCK,
+  value: 1,
+}
+
+export const ShiftLockDisabled: VariableCondition = {
+  type: "variable_if",
+  name: SHIFT_LOCK,
+  value: 0,
+}
+
 /**
  * Transforms 'from' to 'to' with the 'shift' modifier added
  */
-export function transform(from: From, to: KeyCode): Manipulator {
-    return {
-        from: from,
-        to: [{ key_code: to, modifiers: ["shift"] }],
-        conditions: [
-          {
-            type: "variable_if",
-            name: SHIFT_LOCK,
-            value: 1,
-          },
-        ],
-        type: "basic",
-    };
-    
-  }
+export function transform(from: From, to: To): Manipulator {
+  return {
+    from: from,
+    to: [
+      {
+        key_code: to.key_code,
+        modifiers: ["shift", ...(to.modifiers || [])],
+      },
+    ],
+    conditions: [ShiftLockEnabled],
+    type: "basic",
+  };
+}

@@ -1,4 +1,4 @@
-# @mxstbr's Karabiner Elements configuration
+# My Karabiner Elements configuration
 
 Fork of [mxstbr/karabiner](https://github.com/mxstbr/karabiner). See the original repository for more information.
 
@@ -22,7 +22,7 @@ to install the dependencies. (one-time only)
 yarn run build
 ```
 
-builds the `karabiner.json` from the `rules.ts`.
+builds the ` karabiner.json` from the `rules.ts`.
 
 ```
 yarn run watch

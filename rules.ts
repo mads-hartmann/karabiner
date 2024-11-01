@@ -1,8 +1,7 @@
 import fs from "fs";
 import { KarabinerRules } from "./types";
 import { createHyperSubLayers, app, open } from "./utils";
-import * as ShiftLock from "./shiftlock"
-
+import * as ShiftLock from "./shiftlock";
 
 const rules: KarabinerRules[] = [
   {
@@ -27,7 +26,7 @@ const rules: KarabinerRules[] = [
   },
   // Define the Hyper key itself
   {
-    description: "Hyper Key (⌃⌥⇧⌘)",
+    description: "Hyper Key (Right ⌘)",
     manipulators: [
       {
         description: "Right ⌘ -> Hyper Key",
@@ -127,25 +126,250 @@ const rules: KarabinerRules[] = [
       },
     ],
   },
+  // Emacs navigation
+  {
+    description: "Emacs navigation and text manipulation",
+    manipulators: [
+      // M-d
+      {
+        from: {
+          key_code: "d",
+          modifiers: {
+            mandatory: ["option"],
+          },
+        },
+        to: [
+          {
+            key_code: "delete_forward",
+            modifiers: ["option"],
+          },
+        ],
+        conditions: [ShiftLock.ShiftLockDisabled],
+        type: "basic",
+      },
+      // C-p
+      {
+        from: {
+          key_code: "p",
+          modifiers: {
+            mandatory: ["control"],
+            optional: ["any"],
+          },
+        },
+        to: [
+          {
+            key_code: "up_arrow",
+          },
+        ],
+        conditions: [ShiftLock.ShiftLockDisabled],
+        type: "basic",
+      },
+      {
+        from: {
+          key_code: "b",
+          modifiers: {
+            mandatory: ["control"],
+            optional: ["any"],
+          },
+        },
+        to: [
+          {
+            key_code: "left_arrow",
+          },
+        ],
+        conditions: [ShiftLock.ShiftLockDisabled],
+        type: "basic",
+      },
+      {
+        from: {
+          key_code: "f",
+          modifiers: {
+            mandatory: ["control"],
+            optional: ["any"],
+          },
+        },
+        to: [
+          {
+            key_code: "right_arrow",
+          },
+        ],
+        conditions: [ShiftLock.ShiftLockDisabled],
+        type: "basic",
+      },
+
+      // C-g → escape 
+      {
+        from: {
+          key_code: "g",
+          modifiers: {
+            mandatory: ["control"],
+            optional: ["any"],
+          },
+        },
+        to: [
+          {
+            key_code: "escape",
+          },
+        ],
+        conditions: [ShiftLock.ShiftLockDisabled],
+        type: "basic",
+      },
+
+      // C-n
+      {
+        from: {
+          key_code: "n",
+          modifiers: {
+            mandatory: ["control"],
+            optional: ["any"],
+          },
+        },
+        to: [
+          {
+            key_code: "down_arrow",
+          },
+        ],
+        conditions: [ShiftLock.ShiftLockDisabled],
+        type: "basic",
+      },
+
+      // M-b
+      {
+        from: {
+          key_code: "b",
+          modifiers: {
+            mandatory: ["option"],
+          },
+        },
+        to: [
+          {
+            key_code: "left_arrow",
+            modifiers: ["option"],
+          },
+        ],
+        type: "basic",
+        conditions: [ShiftLock.ShiftLockDisabled],
+      },
+      // M-f
+      {
+        from: {
+          key_code: "f",
+          modifiers: {
+            mandatory: ["option"],
+          },
+        },
+        to: [
+          {
+            key_code: "right_arrow",
+            modifiers: ["option"],
+          },
+        ],
+        type: "basic",
+        conditions: [ShiftLock.ShiftLockDisabled],
+      },
+      {
+        from: {
+          key_code: "v",
+          modifiers: {
+            mandatory: ["control"],
+            optional: ["any"],
+          },
+        },
+        to: [
+          {
+            key_code: "page_down",
+          },
+        ],
+        type: "basic",
+      },
+      {
+        from: {
+          key_code: "v",
+          modifiers: {
+            mandatory: ["option"],
+            optional: ["any"],
+          },
+        },
+        to: [
+          {
+            key_code: "page_up",
+          },
+        ],
+        type: "basic",
+      },
+    ],
+  },
   // Experimental: Trying to implement a shift-lock feature so I can emulate Emacs' set-mark feature
   {
     description: "Shift-lock toggle",
     manipulators: [
-      ShiftLock.on({key_code: "spacebar", modifiers: { mandatory: ["control"] }}),
+      ShiftLock.on({
+        key_code: "spacebar",
+        modifiers: { mandatory: ["control"] },
+      }),
 
-      ShiftLock.off({key_code: "spacebar", modifiers: { mandatory: ["control"] }}),
-      ShiftLock.off({key_code: "escape" }),
-      ShiftLock.off({key_code: "delete_or_backspace" }, {passThrough: true}),
-      ShiftLock.off({key_code: "g", modifiers: { mandatory: ["control"] }}),
+      ShiftLock.off({
+        key_code: "spacebar",
+        modifiers: { mandatory: ["control"] },
+      }),
+      ShiftLock.off({ key_code: "escape" }, { passThrough: true }), // pass-through so it also cancels the selection
+      ShiftLock.off({ key_code: "delete_or_backspace" }, { passThrough: true }),
+      ShiftLock.off({ key_code: "v", modifiers: { mandatory: ["command"] }}, { passThrough: true }),
+      ShiftLock.off({ key_code: "g", modifiers: { mandatory: ["control"] }}, { passThrough: false, alsoSendKey: "escape" }),
 
-      ShiftLock.transform({key_code: "n", modifiers: { mandatory: ["control"] }}, "down_arrow"),
-      ShiftLock.transform({key_code: "p", modifiers: { mandatory: ["control"] }}, "up_arrow"),
-      ShiftLock.transform({key_code: "f", modifiers: { mandatory: ["control"] }}, "right_arrow"),
-      ShiftLock.transform({key_code: "b", modifiers: { mandatory: ["control"] }}, "left_arrow"),
-      ShiftLock.transform({key_code: "down_arrow"}, "down_arrow"),
-      ShiftLock.transform({key_code: "up_arrow"}, "up_arrow"),
-      ShiftLock.transform({key_code: "right_arrow"}, "right_arrow"),
-      ShiftLock.transform({key_code: "left_arrow"}, "left_arrow"),
+      // C-n
+      ShiftLock.transform(
+        { key_code: "n", modifiers: { mandatory: ["control"] } },
+        { key_code: "down_arrow" }
+      ),
+      // C-p
+      ShiftLock.transform(
+        { key_code: "p", modifiers: { mandatory: ["control"] } },
+        { key_code: "up_arrow" }
+      ),
+      // C-f
+      ShiftLock.transform(
+        { key_code: "f", modifiers: { mandatory: ["control"] } },
+        { key_code: "right_arrow" }
+      ),
+      // M-f
+      ShiftLock.transform(
+        { key_code: "f", modifiers: { mandatory: ["option"] } },
+        { key_code: "right_arrow", modifiers: ["option"] }
+      ),
+      // C-b
+      ShiftLock.transform(
+        { key_code: "b", modifiers: { mandatory: ["control"] } },
+        { key_code: "left_arrow" }
+      ),
+      // M-b
+      ShiftLock.transform(
+        { key_code: "b", modifiers: { mandatory: ["option"] } },
+        { key_code: "left_arrow", modifiers: ["option"] }
+      ),
+      // C-e
+      ShiftLock.transform(
+        { key_code: "e", modifiers: { mandatory: ["control"] } },
+        { key_code: "right_arrow", modifiers: ["command"] }
+      ),
+      // C-a
+      ShiftLock.transform(
+        { key_code: "a", modifiers: { mandatory: ["control"] } },
+        { key_code: "left_arrow", modifiers: ["command"] }
+      ),
+      ShiftLock.transform(
+        { key_code: "down_arrow" },
+        { key_code: "down_arrow" }
+      ),
+      ShiftLock.transform({ key_code: "up_arrow" }, { key_code: "up_arrow" }),
+      ShiftLock.transform(
+        { key_code: "right_arrow" },
+        { key_code: "right_arrow" }
+      ),
+      ShiftLock.transform(
+        { key_code: "left_arrow" },
+        { key_code: "left_arrow" }
+      ),
     ],
   },
   ...createHyperSubLayers({
@@ -166,11 +390,11 @@ const rules: KarabinerRules[] = [
 
     // s = "System"
     s: {
-      u: { to: [ { key_code: "volume_increment" } ] },
-      j: { to: [ { key_code: "volume_decrement" } ] },
-      i: { to: [ { key_code: "display_brightness_increment" } ],},
-      k: { to: [ { key_code: "display_brightness_decrement" } ],},
-      p: { to: [ { key_code: "play_or_pause" } ],},
+      u: { to: [{ key_code: "volume_increment" }] },
+      j: { to: [{ key_code: "volume_decrement" }] },
+      i: { to: [{ key_code: "display_brightness_increment" }] },
+      k: { to: [{ key_code: "display_brightness_decrement" }] },
+      p: { to: [{ key_code: "play_or_pause" }] },
       // "T"heme
       t: open(`raycast://extensions/raycast/system/toggle-system-appearance`),
       c: open("raycast://extensions/raycast/system/open-camera"),
@@ -178,11 +402,12 @@ const rules: KarabinerRules[] = [
 
     // r = "Raycast"
     r: {
-      c: open("raycast://extensions/thomas/color-picker/pick-color"),
-      n: open("raycast://script-commands/dismiss-notifications"),
+      v: open("raycast://extensions/raycast/clipboard-history/clipboard-history"),
       k: open("raycast://extensions/raycast/raycast/confetti"),
-      a: open("raycast://extensions/raycast/raycast-ai/ai-chat"),
-      h: open("raycast://extensions/raycast/clipboard-history/clipboard-history"),
+      s: open("raycast://extensions/raycast/snippets/search-snippets"),
+      // C for screen "C"aptures
+      c: open("raycast://extensions/raycast/screenshots/search-screenshots"),
+      f: open("raycast://extensions/raycast/floating-notes/toggle-floating-notes-window"),
     },
   }),
 ];
