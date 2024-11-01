@@ -1,9 +1,8 @@
-import fs from "fs";
 import { KarabinerRules } from "./types";
-import { createHyperSubLayers, app, open } from "./utils";
+import { createHyperSubLayers, open } from "./utils";
 import * as ShiftLock from "./shiftlock";
 
-const rules: KarabinerRules[] = [
+export const rules: KarabinerRules[] = [
   {
     description: "Caps Lock to Control",
     manipulators: [
@@ -24,7 +23,6 @@ const rules: KarabinerRules[] = [
       },
     ],
   },
-  // Define the Hyper key itself
   {
     description: "Hyper Key (Right ⌘)",
     manipulators: [
@@ -126,6 +124,36 @@ const rules: KarabinerRules[] = [
       },
     ],
   },
+  // Experimental: Trying to implement a shift-lock feature so I can emulate Emacs' set-mark feature
+  {
+    description: "Shift-lock toggle",
+    manipulators: [
+      ShiftLock.on({key_code: "spacebar", modifiers: { mandatory: ["control"] }}),
+      ShiftLock.off({key_code: "spacebar", modifiers: { mandatory: ["control"] }}),
+      ShiftLock.off({ key_code: "escape" }, { passThrough: true }), // pass-through so it also cancels the selection
+      ShiftLock.off({ key_code: "delete_or_backspace" }, { passThrough: true }),
+      ShiftLock.off({ key_code: "v", modifiers: { mandatory: ["command"] }}, { passThrough: true }),
+      ShiftLock.off({ key_code: "x", modifiers: { mandatory: ["command"] }}, { passThrough: true }),
+      ShiftLock.off({ key_code: "g", modifiers: { mandatory: ["control"] }}, { passThrough: false, alsoSendKey: "escape" }), // C-g
+
+      // TODO: I haven't been able to implement shift-lock as a generic add shift to all key presses so for now I'll have to re-define
+      // all navigation keys with shift-lock enabled.
+      ShiftLock.transform({ key_code: "n", modifiers: { mandatory: ["control"] } }, { key_code: "down_arrow" }), // C-n
+      ShiftLock.transform({ key_code: "p", modifiers: { mandatory: ["control"] } }, { key_code: "up_arrow" }), // C-p
+      ShiftLock.transform({ key_code: "f", modifiers: { mandatory: ["control"] } }, { key_code: "right_arrow" }), // C-f
+      ShiftLock.transform({ key_code: "f", modifiers: { mandatory: ["option"] } }, { key_code: "right_arrow", modifiers: ["option"] }), // M-f
+      ShiftLock.transform({ key_code: "b", modifiers: { mandatory: ["control"] } }, { key_code: "left_arrow" }), // C-b
+      ShiftLock.transform({ key_code: "b", modifiers: { mandatory: ["option"] } }, { key_code: "left_arrow", modifiers: ["option"] }), // M-b
+      ShiftLock.transform({ key_code: "e", modifiers: { mandatory: ["control"] } }, { key_code: "right_arrow", modifiers: ["command"] }), // C-e
+      ShiftLock.transform({ key_code: "a", modifiers: { mandatory: ["control"] } }, { key_code: "left_arrow", modifiers: ["command"] }), // C-a
+      ShiftLock.transform({ key_code: "v", modifiers: { mandatory: ["control"] } }, { key_code: "page_down" }), // C-v
+      ShiftLock.transform({ key_code: "v", modifiers: { mandatory: ["option"] } }, { key_code: "page_up" }), // M-v
+      ShiftLock.transform({ key_code: "left_arrow" }, { key_code: "left_arrow" }),
+      ShiftLock.transform({ key_code: "up_arrow" }, { key_code: "up_arrow" }),
+      ShiftLock.transform({ key_code: "right_arrow" }, { key_code: "right_arrow" }),
+      ShiftLock.transform({ key_code: "down_arrow" }, { key_code: "down_arrow" }),
+    ],
+  },
   // Emacs navigation
   {
     description: "Emacs navigation and text manipulation",
@@ -144,7 +172,6 @@ const rules: KarabinerRules[] = [
             modifiers: ["option"],
           },
         ],
-        conditions: [ShiftLock.ShiftLockDisabled],
         type: "basic",
       },
       // C-p
@@ -161,9 +188,9 @@ const rules: KarabinerRules[] = [
             key_code: "up_arrow",
           },
         ],
-        conditions: [ShiftLock.ShiftLockDisabled],
         type: "basic",
       },
+      // C-b → left arrow
       {
         from: {
           key_code: "b",
@@ -177,9 +204,9 @@ const rules: KarabinerRules[] = [
             key_code: "left_arrow",
           },
         ],
-        conditions: [ShiftLock.ShiftLockDisabled],
         type: "basic",
       },
+      // C-f → right arrow
       {
         from: {
           key_code: "f",
@@ -193,10 +220,8 @@ const rules: KarabinerRules[] = [
             key_code: "right_arrow",
           },
         ],
-        conditions: [ShiftLock.ShiftLockDisabled],
         type: "basic",
       },
-
       // C-g → escape 
       {
         from: {
@@ -211,10 +236,8 @@ const rules: KarabinerRules[] = [
             key_code: "escape",
           },
         ],
-        conditions: [ShiftLock.ShiftLockDisabled],
         type: "basic",
       },
-
       // C-n
       {
         from: {
@@ -229,10 +252,8 @@ const rules: KarabinerRules[] = [
             key_code: "down_arrow",
           },
         ],
-        conditions: [ShiftLock.ShiftLockDisabled],
         type: "basic",
       },
-
       // M-b
       {
         from: {
@@ -248,7 +269,6 @@ const rules: KarabinerRules[] = [
           },
         ],
         type: "basic",
-        conditions: [ShiftLock.ShiftLockDisabled],
       },
       // M-f
       {
@@ -265,8 +285,8 @@ const rules: KarabinerRules[] = [
           },
         ],
         type: "basic",
-        conditions: [ShiftLock.ShiftLockDisabled],
       },
+      // C-v
       {
         from: {
           key_code: "v",
@@ -282,6 +302,7 @@ const rules: KarabinerRules[] = [
         ],
         type: "basic",
       },
+      // M-v
       {
         from: {
           key_code: "v",
@@ -298,137 +319,14 @@ const rules: KarabinerRules[] = [
         type: "basic",
       },
     ],
-  },
-  // Experimental: Trying to implement a shift-lock feature so I can emulate Emacs' set-mark feature
-  {
-    description: "Shift-lock toggle",
-    manipulators: [
-      ShiftLock.on({
-        key_code: "spacebar",
-        modifiers: { mandatory: ["control"] },
-      }),
-
-      ShiftLock.off({
-        key_code: "spacebar",
-        modifiers: { mandatory: ["control"] },
-      }),
-      ShiftLock.off({ key_code: "escape" }, { passThrough: true }), // pass-through so it also cancels the selection
-      ShiftLock.off({ key_code: "delete_or_backspace" }, { passThrough: true }),
-      ShiftLock.off({ key_code: "v", modifiers: { mandatory: ["command"] }}, { passThrough: true }),
-      ShiftLock.off({ key_code: "g", modifiers: { mandatory: ["control"] }}, { passThrough: false, alsoSendKey: "escape" }),
-
-      // C-n
-      ShiftLock.transform(
-        { key_code: "n", modifiers: { mandatory: ["control"] } },
-        { key_code: "down_arrow" }
-      ),
-      // C-p
-      ShiftLock.transform(
-        { key_code: "p", modifiers: { mandatory: ["control"] } },
-        { key_code: "up_arrow" }
-      ),
-      // C-f
-      ShiftLock.transform(
-        { key_code: "f", modifiers: { mandatory: ["control"] } },
-        { key_code: "right_arrow" }
-      ),
-      // M-f
-      ShiftLock.transform(
-        { key_code: "f", modifiers: { mandatory: ["option"] } },
-        { key_code: "right_arrow", modifiers: ["option"] }
-      ),
-      // C-b
-      ShiftLock.transform(
-        { key_code: "b", modifiers: { mandatory: ["control"] } },
-        { key_code: "left_arrow" }
-      ),
-      // M-b
-      ShiftLock.transform(
-        { key_code: "b", modifiers: { mandatory: ["option"] } },
-        { key_code: "left_arrow", modifiers: ["option"] }
-      ),
-      // C-e
-      ShiftLock.transform(
-        { key_code: "e", modifiers: { mandatory: ["control"] } },
-        { key_code: "right_arrow", modifiers: ["command"] }
-      ),
-      // C-a
-      ShiftLock.transform(
-        { key_code: "a", modifiers: { mandatory: ["control"] } },
-        { key_code: "left_arrow", modifiers: ["command"] }
-      ),
-      ShiftLock.transform(
-        { key_code: "down_arrow" },
-        { key_code: "down_arrow" }
-      ),
-      ShiftLock.transform({ key_code: "up_arrow" }, { key_code: "up_arrow" }),
-      ShiftLock.transform(
-        { key_code: "right_arrow" },
-        { key_code: "right_arrow" }
-      ),
-      ShiftLock.transform(
-        { key_code: "left_arrow" },
-        { key_code: "left_arrow" }
-      ),
-    ],
-  },
+  },  
   ...createHyperSubLayers({
-    // o = "Open" applications
-    o: {
-      1: app("1Password"),
-      g: app("Google Chrome"),
-      c: app("Notion Calendar"),
-      v: app("Visual Studio Code"),
-      s: app("Slack"),
-      n: app("Notion"),
-      t: app("Terminal"),
-      f: app("Finder"),
-      r: app("Texts"),
-      // "i"Message
-      p: app("Spotify"),
-    },
-
-    // s = "System"
-    s: {
-      u: { to: [{ key_code: "volume_increment" }] },
-      j: { to: [{ key_code: "volume_decrement" }] },
-      i: { to: [{ key_code: "display_brightness_increment" }] },
-      k: { to: [{ key_code: "display_brightness_decrement" }] },
-      p: { to: [{ key_code: "play_or_pause" }] },
-      // "T"heme
-      t: open(`raycast://extensions/raycast/system/toggle-system-appearance`),
-      c: open("raycast://extensions/raycast/system/open-camera"),
-    },
-
     // r = "Raycast"
     r: {
       v: open("raycast://extensions/raycast/clipboard-history/clipboard-history"),
       k: open("raycast://extensions/raycast/raycast/confetti"),
       s: open("raycast://extensions/raycast/snippets/search-snippets"),
-      // C for screen "C"aptures
-      c: open("raycast://extensions/raycast/screenshots/search-screenshots"),
       f: open("raycast://extensions/raycast/floating-notes/toggle-floating-notes-window"),
     },
   }),
 ];
-
-fs.writeFileSync(
-  "karabiner.json",
-  JSON.stringify(
-    {
-      global: {
-        show_in_menu_bar: false,
-      },
-      profiles: [
-        {
-          name: "Default",
-          complex_modifications: {
-            rules,
-          },
-        },
-      ],
-    },
-    null,
-    2
-  )
-);
