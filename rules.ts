@@ -323,10 +323,13 @@ export const rules: KarabinerRules[] = [
   ...createHyperSubLayers({
     // r = "Raycast"
     r: {
+      // Can't seem to decide on 'c' for clipboard history or 'v' as I'm about to paste
+      c: open("raycast://extensions/raycast/clipboard-history/clipboard-history"),
       v: open("raycast://extensions/raycast/clipboard-history/clipboard-history"),
       k: open("raycast://extensions/raycast/raycast/confetti"),
       s: open("raycast://extensions/raycast/snippets/search-snippets"),
-      f: open("raycast://extensions/raycast/floating-notes/toggle-floating-notes-window"),
+      i: open("raycast://extensions/raycast/screenshots/search-screenshots"),
+      n: open("raycast://extensions/raycast/raycast-notes/raycast-notes"),
     },
   }),
 ];
