@@ -375,6 +375,7 @@ export const rules: KarabinerRules[] = [
     ],
   },
   ...createHyperSubLayers({
+    w: open("raycast://extensions/raycast/navigation/switch-windows"),
     // a = "Application"
     o: {
       e: app("Visual Studio Code"),
