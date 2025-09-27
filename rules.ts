@@ -1,5 +1,5 @@
 import { KarabinerRules } from "./types";
-import { createHyperSubLayers, open } from "./utils";
+import { app, createHyperSubLayers, open } from "./utils";
 import * as ShiftLock from "./shiftlock";
 
 export const rules: KarabinerRules[] = [
@@ -128,30 +128,84 @@ export const rules: KarabinerRules[] = [
   {
     description: "Shift-lock toggle",
     manipulators: [
-      ShiftLock.on({key_code: "spacebar", modifiers: { mandatory: ["control"] }}),
-      ShiftLock.off({key_code: "spacebar", modifiers: { mandatory: ["control"] }}),
+      ShiftLock.on({
+        key_code: "spacebar",
+        modifiers: { mandatory: ["control"] },
+      }),
+      ShiftLock.off({
+        key_code: "spacebar",
+        modifiers: { mandatory: ["control"] },
+      }),
       ShiftLock.off({ key_code: "escape" }, { passThrough: true }), // pass-through so it also cancels the selection
       ShiftLock.off({ key_code: "delete_or_backspace" }, { passThrough: true }),
-      ShiftLock.off({ key_code: "v", modifiers: { mandatory: ["command"] }}, { passThrough: true }),
-      ShiftLock.off({ key_code: "x", modifiers: { mandatory: ["command"] }}, { passThrough: true }),
-      ShiftLock.off({ key_code: "g", modifiers: { mandatory: ["control"] }}, { passThrough: false, alsoSendKey: "escape" }), // C-g
+      ShiftLock.off(
+        { key_code: "v", modifiers: { mandatory: ["command"] } },
+        { passThrough: true }
+      ),
+      ShiftLock.off(
+        { key_code: "x", modifiers: { mandatory: ["command"] } },
+        { passThrough: true }
+      ),
+      ShiftLock.off(
+        { key_code: "g", modifiers: { mandatory: ["control"] } },
+        { passThrough: false, alsoSendKey: "escape" }
+      ), // C-g
 
       // TODO: I haven't been able to implement shift-lock as a generic add shift to all key presses so for now I'll have to re-define
       // all navigation keys with shift-lock enabled.
-      ShiftLock.transform({ key_code: "n", modifiers: { mandatory: ["control"] } }, { key_code: "down_arrow" }), // C-n
-      ShiftLock.transform({ key_code: "p", modifiers: { mandatory: ["control"] } }, { key_code: "up_arrow" }), // C-p
-      ShiftLock.transform({ key_code: "f", modifiers: { mandatory: ["control"] } }, { key_code: "right_arrow" }), // C-f
-      ShiftLock.transform({ key_code: "f", modifiers: { mandatory: ["option"] } }, { key_code: "right_arrow", modifiers: ["option"] }), // M-f
-      ShiftLock.transform({ key_code: "b", modifiers: { mandatory: ["control"] } }, { key_code: "left_arrow" }), // C-b
-      ShiftLock.transform({ key_code: "b", modifiers: { mandatory: ["option"] } }, { key_code: "left_arrow", modifiers: ["option"] }), // M-b
-      ShiftLock.transform({ key_code: "e", modifiers: { mandatory: ["control"] } }, { key_code: "right_arrow", modifiers: ["command"] }), // C-e
-      ShiftLock.transform({ key_code: "a", modifiers: { mandatory: ["control"] } }, { key_code: "left_arrow", modifiers: ["command"] }), // C-a
-      ShiftLock.transform({ key_code: "v", modifiers: { mandatory: ["control"] } }, { key_code: "page_down" }), // C-v
-      ShiftLock.transform({ key_code: "v", modifiers: { mandatory: ["option"] } }, { key_code: "page_up" }), // M-v
-      ShiftLock.transform({ key_code: "left_arrow" }, { key_code: "left_arrow" }),
+      ShiftLock.transform(
+        { key_code: "n", modifiers: { mandatory: ["control"] } },
+        { key_code: "down_arrow" }
+      ), // C-n
+      ShiftLock.transform(
+        { key_code: "p", modifiers: { mandatory: ["control"] } },
+        { key_code: "up_arrow" }
+      ), // C-p
+      ShiftLock.transform(
+        { key_code: "f", modifiers: { mandatory: ["control"] } },
+        { key_code: "right_arrow" }
+      ), // C-f
+      ShiftLock.transform(
+        { key_code: "f", modifiers: { mandatory: ["option"] } },
+        { key_code: "right_arrow", modifiers: ["option"] }
+      ), // M-f
+      ShiftLock.transform(
+        { key_code: "b", modifiers: { mandatory: ["control"] } },
+        { key_code: "left_arrow" }
+      ), // C-b
+      ShiftLock.transform(
+        { key_code: "b", modifiers: { mandatory: ["option"] } },
+        { key_code: "left_arrow", modifiers: ["option"] }
+      ), // M-b
+      ShiftLock.transform(
+        { key_code: "e", modifiers: { mandatory: ["control"] } },
+        { key_code: "right_arrow", modifiers: ["command"] }
+      ), // C-e
+      ShiftLock.transform(
+        { key_code: "a", modifiers: { mandatory: ["control"] } },
+        { key_code: "left_arrow", modifiers: ["command"] }
+      ), // C-a
+      ShiftLock.transform(
+        { key_code: "v", modifiers: { mandatory: ["control"] } },
+        { key_code: "page_down" }
+      ), // C-v
+      ShiftLock.transform(
+        { key_code: "v", modifiers: { mandatory: ["option"] } },
+        { key_code: "page_up" }
+      ), // M-v
+      ShiftLock.transform(
+        { key_code: "left_arrow" },
+        { key_code: "left_arrow" }
+      ),
       ShiftLock.transform({ key_code: "up_arrow" }, { key_code: "up_arrow" }),
-      ShiftLock.transform({ key_code: "right_arrow" }, { key_code: "right_arrow" }),
-      ShiftLock.transform({ key_code: "down_arrow" }, { key_code: "down_arrow" }),
+      ShiftLock.transform(
+        { key_code: "right_arrow" },
+        { key_code: "right_arrow" }
+      ),
+      ShiftLock.transform(
+        { key_code: "down_arrow" },
+        { key_code: "down_arrow" }
+      ),
     ],
   },
   // Emacs navigation
@@ -222,7 +276,7 @@ export const rules: KarabinerRules[] = [
         ],
         type: "basic",
       },
-      // C-g → escape 
+      // C-g → escape
       {
         from: {
           key_code: "g",
@@ -319,13 +373,22 @@ export const rules: KarabinerRules[] = [
         type: "basic",
       },
     ],
-  },  
+  },
   ...createHyperSubLayers({
+    // a = "Application"
+    o: {
+      e: app("Visual Studio Code"),
+      t: app("Ghostty"),
+    },
     // r = "Raycast"
     r: {
       // Can't seem to decide on 'c' for clipboard history or 'v' as I'm about to paste
-      c: open("raycast://extensions/raycast/clipboard-history/clipboard-history"),
-      v: open("raycast://extensions/raycast/clipboard-history/clipboard-history"),
+      c: open(
+        "raycast://extensions/raycast/clipboard-history/clipboard-history"
+      ),
+      v: open(
+        "raycast://extensions/raycast/clipboard-history/clipboard-history"
+      ),
       k: open("raycast://extensions/raycast/raycast/confetti"),
       s: open("raycast://extensions/raycast/snippets/search-snippets"),
       i: open("raycast://extensions/raycast/screenshots/search-screenshots"),

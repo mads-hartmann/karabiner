@@ -165,3 +165,7 @@ export function open(...what: string[]): LayerCommand {
     description: `Open ${what.join(" & ")}`,
   };
 }
+
+export function app(name: string): LayerCommand {
+  return open(`-a '${name}.app'`);
+}
