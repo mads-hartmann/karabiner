@@ -375,25 +375,24 @@ export const rules: KarabinerRules[] = [
     ],
   },
   ...createHyperSubLayers({
-    w: open("raycast://extensions/raycast/navigation/switch-windows"),
+    // I used to have Raycast shortcuts mapped under R but I use these too much to make
+    // the additional keypress worth it
+    // Note: I'm using "-g" to `open` so raycast doesn't gain focus
+    w: open("raycast://extensions/raycast/navigation/switch-windows", ["-g"]),
+    c: open(
+      "raycast://extensions/raycast/clipboard-history/clipboard-history",
+      ["-g"]
+    ),
+    k: open("raycast://extensions/raycast/raycast/confetti", ["-g"]),
+    s: open("raycast://extensions/raycast/snippets/search-snippets", ["-g"]),
+    i: open("raycast://extensions/raycast/screenshots/search-screenshots", [
+      "-g",
+    ]),
+    n: open("raycast://extensions/raycast/raycast-notes/raycast-notes", ["-g"]),
     // a = "Application"
-    o: {
+    a: {
       e: app("Visual Studio Code"),
       t: app("Ghostty"),
-    },
-    // r = "Raycast"
-    r: {
-      // Can't seem to decide on 'c' for clipboard history or 'v' as I'm about to paste
-      c: open(
-        "raycast://extensions/raycast/clipboard-history/clipboard-history"
-      ),
-      v: open(
-        "raycast://extensions/raycast/clipboard-history/clipboard-history"
-      ),
-      k: open("raycast://extensions/raycast/raycast/confetti"),
-      s: open("raycast://extensions/raycast/snippets/search-snippets"),
-      i: open("raycast://extensions/raycast/screenshots/search-screenshots"),
-      n: open("raycast://extensions/raycast/raycast-notes/raycast-notes"),
     },
   }),
 ];
