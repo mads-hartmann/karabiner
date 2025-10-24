@@ -124,6 +124,71 @@ export const rules: KarabinerRules[] = [
       },
     ],
   },
+  {
+    description: "Change ⌘^awsd to arrow keys",
+    manipulators: [
+      {
+        from: {
+          key_code: "a",
+          modifiers: {
+            mandatory: ["command", "control"],
+            optional: ["any"],
+          },
+        },
+        to: [
+          {
+            key_code: "left_arrow",
+          },
+        ],
+        type: "basic",
+      },
+      {
+        from: {
+          key_code: "s",
+          modifiers: {
+            mandatory: ["command", "control"],
+            optional: ["any"],
+          },
+        },
+        to: [
+          {
+            key_code: "down_arrow",
+          },
+        ],
+        type: "basic",
+      },
+      {
+        from: {
+          key_code: "w",
+          modifiers: {
+            mandatory: ["command", "control"],
+            optional: ["any"],
+          },
+        },
+        to: [
+          {
+            key_code: "up_arrow",
+          },
+        ],
+        type: "basic",
+      },
+      {
+        from: {
+          key_code: "d",
+          modifiers: {
+            mandatory: ["command", "control"],
+            optional: ["any"],
+          },
+        },
+        to: [
+          {
+            key_code: "right_arrow",
+          },
+        ],
+        type: "basic",
+      },
+    ],
+  },
   // Experimental: Trying to implement a shift-lock feature so I can emulate Emacs' set-mark feature
   {
     description: "Shift-lock toggle",
